@@ -1,21 +1,23 @@
 <?php
 // MySQL接続情報
-$servername = "localhost";
-$username = "root"; // ローカルXAMPPのデフォルト
-$password = "";     // デフォルトではパスワードなし
-$dbname = "gs_db";  // gs_dbというデータベース名に変更
 
-// MySQL接続
-$conn = new mysqli($servername, $username, $password, $dbname);
+try {
+    $db_name = 'team-gias_gs_db';
+    $db_host = '';
+    $db_id = '';
+    $db_pw = '';
 
-// 接続エラーチェック
-if ($conn->connect_error) {
-    die("接続失敗: " . $conn->connect_error);
+    $server_info = 'mysql:dbname='.$db_name.';charset=utf8;host='.$db_host;
+    $pdo = new PDO($server_info, $db_id, $db_pw);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // エラーモードを設定
+} catch (PDOException $e) {
+    exit('DB Connection Error: ' . $e->getMessage());
 }
 
 // アンケート結果を取得
 $sql = "SELECT * FROM gs_an_table";
-$result = $conn->query($sql);
+$stmt = $pdo->query($sql);
+$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -40,33 +42,27 @@ $result = $conn->query($sql);
             <th>評価</th> <!-- 新たに評価（★）を追加 -->
         </tr>
 
-        <?php if ($result->num_rows > 0): ?>
-            <?php while($row = $result->fetch_assoc()): ?>
+        <?php if (count($results) > 0): ?>
+            <?php foreach ($results as $row): ?>
                 <?php
                 // 「はい」と答えた数をカウント
                 $star_count = $row['eco_bag'] + $row['my_bottle'] + $row['walking_bike'] + $row['power_bike'];
                 $stars = str_repeat('★', $star_count); // ★の数を決定
                 ?>
                 <tr>
-                    <td><?= htmlspecialchars($row['name']) ?></td>
-                    <td><?= htmlspecialchars($row['email']) ?></td>
+                    <td><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?></td>
                     <td><?= $row['eco_bag'] ? 'はい' : 'いいえ' ?></td>
                     <td><?= $row['my_bottle'] ? 'はい' : 'いいえ' ?></td>
                     <td><?= $row['walking_bike'] ? 'はい' : 'いいえ' ?></td>
                     <td><?= $row['power_bike'] ? 'はい' : 'いいえ' ?></td>
                     <td><?= $stars ?></td> <!-- 評価として★を表示 -->
                 </tr>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         <?php else: ?>
             <tr>
                 <td colspan="7">データがありません。</td>
             </tr>
         <?php endif; ?>
     </table>
-
-</body>
-</html>
-
-<?php
-$conn->close();
-?>
+</body
