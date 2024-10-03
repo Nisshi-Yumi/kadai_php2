@@ -1,16 +1,14 @@
 <?php
-// MySQL接続情報
-$servername = "localhost";
-$username = "root";  // ローカルXAMPPのデフォルト
-$password = "";      // デフォルトではパスワードなし
-$dbname = "gs_db";   // gs_dbというデータベース名に変更
-
 try {
-    // PDOによるデータベース接続
-    $pdo = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8", $username, $password);
-    // エラーモードを例外に設定
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
+    // MySQL接続情報
+$db_name = 'team-gias_gs_db';
+$db_host = 'mysql3101.db.sakura.ne.jp';
+$password = "";     
+$dbname = "";   //
+
+} catch (PDOException $e) {
+    exit('DB_CONNECT:'.$e->getMessage());
+  }
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // サニタイズされた入力データをセット
         $name = isset($_POST['name']) ? $_POST['name'] : '';
